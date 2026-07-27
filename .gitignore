@@ -1,0 +1,20 @@
+# Cordova & Node build folders
+node_modules/
+platforms/
+plugins/
+*.apk
+*.aab
+
+# Python cache & temporary files
+__pycache__/
+*.pyc
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Keep core Cordova and GitHub workflow files
+!config.xml
+!package.json
+!www/
+!.github/

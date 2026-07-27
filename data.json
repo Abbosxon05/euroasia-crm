@@ -1,0 +1,53 @@
+{
+  "groups": [
+    {
+      "id": 1,
+      "name": "IELTS Morning",
+      "schedule": "Du-Chor-Juma 09:00"
+    },
+    {
+      "id": 2,
+      "name": "General English",
+      "schedule": "Sesh-Payshanba-Shanba 14:00"
+    }
+  ],
+  "students": [
+    {
+      "id": 1,
+      "name": "Ali Valiyev",
+      "group_id": 1,
+      "parent_phone": "+998901234567",
+      "monthly_fee": 500000,
+      "paid": true,
+      "note": null,
+      "homework_missed": 0
+    },
+    {
+      "id": 2,
+      "name": "Madina Karimova",
+      "group_id": 1,
+      "parent_phone": "+998919876543",
+      "monthly_fee": 500000,
+      "paid": false,
+      "note": null,
+      "homework_missed": 1
+    }
+  ],
+  "attendance": [],
+  "users": [
+    {
+      "id": 1,
+      "name": "Direktor (Admin)",
+      "role": "admin",
+      "code": "0000",
+      "group_id": null
+    },
+    {
+      "id": 2,
+      "name": "Ustoz (1-guruh o'qituvchisi)",
+      "role": "teacher",
+      "code": "1111",
+      "group_id": 1
+    }
+  ]
+}

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b3554" />
+  <meta name="description" content="EuroAsia Education CRM - guruhlar, o'quvchilar, davomat, to'lov" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>EuroAsia Education CRM</title>
+  <style>
+    :root {
+      --primary: #0b3554;
+      --secondary: #ffb703;
+      --danger: #d62828;
+      --success: #1b9c5a;
+      --bg: #f3f6fb;
+      --card: rgba(255,255,255,0.95);
+      --text: #1f2937;
+      --muted: #64748b;
+      --border: #d8e0ea;
+      --shadow: 0 10px 25px rgba(11, 53, 84, 0.10);
+      --bg-logo: none;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(rgba(243,246,251,0.96), rgba(243,246,251,0.97)),
+        var(--bg-logo) center center / 320px no-repeat fixed,
+        var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Splash loader */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0b3554, #1b4f7d);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+      color: #fff;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash .splash-logo {
+      width: 110px;
+      height: 110px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+      border: 2px solid rgba(255,255,255,0.25);
+    }
+    #splash .splash-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    #splash .splash-sub {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 6px;
+    }
+    #splash .splash-spinner {
+      margin-top: 24px;
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: #ffb703;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Install banner */
+    #installBanner {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      background: #0b3554;
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+    }
+    #installBanner.show { display: flex; }
+    #installBanner .info { flex: 1; font-size: 13px; line-height: 1.4; }
+    #installBanner b { color: #ffb703; }
+    #installBanner button {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #installBanner .install-btn { background: #ffb703; color: #111; }
+    #installBanner .close-btn { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand img {
+      width: 84px; height: 84px; object-fit: contain;
+      background: #fff; border-radius: 14px; padding: 8px;
+      border: 1px solid var(--border); flex-shrink: 0;
+    }
+    .brand h1 { margin: 0; font-size: 26px; line-height: 1.2; color: var(--primary); word-break: break-word; }
+    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .btn {
+      border: none; border-radius: 10px; padding: 10px 14px;
+      font-size: 14px; cursor: pointer; transition: 0.2s;
+      font-weight: 600; white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: var(--secondary); color: #111; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-light { background: #eef4fb; color: var(--primary); border: 1px solid var(--border); }
+    .btn-sms { background: #ff9800; color: #fff; }
+    .btn-call { background: #1aa34a; color: #fff; }
+
+    .container { width: 100%; max-width: 1300px; margin: 0 auto; padding: 12px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px; padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.7);
+      overflow: hidden;
+    }
+    .stat h3 { margin: 0; font-size: 14px; color: var(--muted); font-weight: 600; }
+    .stat .value { margin-top: 8px; font-size: 28px; font-weight: 800; color: var(--primary); }
+
+    .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; margin-top: 16px; }
+    .section-title { margin: 0 0 12px; color: var(--primary); font-size: 20px; line-height: 1.3; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .form-group label { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+    input, select, textarea {
+      width: 100%; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px; font-size: 16px;
+      background: #fff; outline: none;
+    }
+    textarea { resize: vertical; min-height: 72px; }
+    .actions-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+    .table-wrap {
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch; border-radius: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 920px; font-size: 14px; }
+    th, td {
+      border: 1px solid #e2e8f0; padding: 10px;
+      text-align: center; vertical-align: middle;
+      background: rgba(255,255,255,0.78);
+    }
+    th { background: #edf4fb; color: var(--primary); font-weight: 700; }
+
+    .badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .badge-paid { background: #dcfce7; color: #166534; }
+    .badge-unpaid { background: #fee2e2; color: #991b1b; }
+
+    .mini-buttons { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .mini-buttons .btn { padding: 7px 9px; font-size: 12px; border-radius: 8px; }
+
+    .helper-box { margin-top: 16px; }
+    .helper-response {
+      margin-top: 10px; background: #f8fbff;
+      border: 1px dashed #bfd0e4; border-radius: 12px;
+      padding: 12px; color: #34495e; min-height: 54px; line-height: 1.5;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: none; align-items: center; justify-content: center;
+      padding: 12px; z-index: 999;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      width: 100%; max-width: 860px; max-height: 92vh;
+      overflow-y: auto; background: #fff; border-radius: 18px;
+      padding: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .modal-top {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .attendance-list { display: grid; gap: 8px; margin-top: 12px; }
+    .attendance-item {
+      padding: 10px 12px; border-radius: 10px;
+      background: #f8fbff; border: 1px solid #d9e5f2;
+      display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+    .footer-note { margin-top: 16px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+    @media (max-width: 992px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .main-grid { grid-template-columns: 1fr; }
+      .brand h1 { font-size: 22px; }
+      .brand img { width: 76px; height: 76px; }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        background:
+          linear-gradient(rgba(243,246,251,0.97), rgba(243,246,251,0.98)),
+          var(--bg-logo) center 120px / 220px no-repeat fixed,
+          var(--bg);
+      }
+      .container { padding: 10px; }
+      .header { flex-direction: column; align-items: stretch; padding: 14px; border-radius: 14px; }
+      .brand { align-items: center; }
+      .brand img { width: 64px; height: 64px; border-radius: 12px; }
+      .brand h1 { font-size: 20px; }
+      .brand p { font-size: 13px; }
+      .top-actions { width: 100%; justify-content: stretch; }
+      .top-actions .btn { flex: 1 1 calc(50% - 8px); text-align: center; padding: 11px 10px; font-size: 13px; }
+      .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+      .card { padding: 14px; border-radius: 14px; }
+      .stat .value { font-size: 22px; }
+      .section-title { font-size: 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .actions-row { flex-direction: column; }
+      .actions-row .btn { width: 100%; }
+      .mini-buttons { flex-direction: column; align-items: stretch; }
+      .mini-buttons .btn { width: 100%; font-size: 13px; padding: 10px; }
+      table { min-width: 760px; font-size: 13px; }
+      th, td { padding: 8px; }
+      .modal { padding: 0; }
+      .modal-content { max-width: 100%; width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; padding: 14px; }
+      .attendance-item { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 8px; }
+      .brand { align-items: flex-start; }
+      .brand img { width: 56px; height: 56px; }
+      .brand h1 { font-size: 18px; }
+      .brand p { font-size: 12px; }
+      .top-actions .btn { flex: 1 1 100%; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .card { padding: 12px; }
+      .stat h3 { font-size: 13px; }
+      .stat .value { font-size: 20px; }
+      .section-title { font-size: 17px; }
+      input, select, textarea { font-size: 16px; padding: 11px; }
+      .helper-response { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-logo">EA</div>
+  <div class="splash-title">EUROASIA</div>
+  <div class="splash-sub">Education CRM</div>
+  <div class="splash-spinner"></div>
+</div>
+
+<div id="installBanner">
+  <div class="info"><b>Ilovani o‘rnating</b><br>Bosh ekranga qo‘shish — internet kerak emas</div>
+  <button class="install-btn" id="installBtn">O‘rnatish</button>
+  <button class="close-btn" id="installClose">✕</button>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <img id="logoImg" alt="EuroAsia Logo" />
+      <div>
+        <h1>EUROASIA EDUCATION</h1>
+        <p>Guruhlar, o‘quvchilar, davomat, to‘lov, SMS va qo‘ng‘iroq boshqaruvi</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-secondary" onclick="exportData()">Export JSON</button>
+      <button class="btn btn-light" onclick="document.getElementById('importFile').click()">Import JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-danger" onclick="resetAll()">Tozalash</button>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="card stat"><h3>Jami guruhlar</h3><div class="value" id="statGroups">0</div></div>
+    <div class="card stat"><h3>Jami o‘quvchilar</h3><div class="value" id="statStudents">0</div></div>
+    <div class="card stat"><h3>Shu oy dars kelishlar</h3><div class="value" id="statAttendances">0</div></div>
+    <div class="card stat"><h3>Qarzdorlar</h3><div class="value" id="statDebtors">0</div></div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="card">
+        <h2 class="section-title">Guruh qo‘shish / tahrirlash</h2>
+        <input type="hidden" id="groupEditId">
+        <div class="form-group">
+          <label>Guruh nomi</label>
+          <input type="text" id="groupName" placeholder="Masalan: IELTS Morning">
+        </div>
+        <div class="form-group">
+          <label>Dars jadvali</label>
+          <input type="text" id="groupSchedule" placeholder="Masalan: Du-Chor-Juma 14:00">
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-primary" onclick="saveGroup()">Saqlash</button>
+          <button class="btn btn-light" onclick="clearGroupForm()">Bekor qilish</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h2 class="section-title">O‘quvchi qo‘shish / tahrirlash</h2>
+        <input type="hidden" id="studentEditId">
+        <div class="form-group">
+          <label>O‘quvchi ismi</label>
+          <input type="text" id="studentName" placeholder="Masalan: Ali Valiyev">
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Guruh</label>
+            <select id="studentGroup"></select>
+          </div>
+          <div class="form-group">
+            <label>Ota-ona telefoni</label>
+            <input type="text" id="studentPhone" placeholder="+998901234567">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Oylik to‘lov</label>
+            <input type="number" id="studentFee" placeholder="500000">
+          </div>
+          <div class="form-group">
+            <label>To‘lov holati</label>
+            <select id="studentPaid">
+              <option value="true">To‘langan</option>
+              <option value="false">To‘lanmagan</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Izoh</label>
+          <textarea id="studentNote" placeholder="Qo‘shimcha izoh..."></textarea>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-success" onclick="saveStudent()">Saqlash</button>
+          <button class="btn btn-light" onclick="clearStudentForm()">Bekor qilish</button>
+        </div>
+      </div>
+
+      <div class="card helper-box">
+        <h2 class="section-title">AI yordamchi</h2>
+        <div class="form-group">
+          <label>Savol</label>
+          <input type="text" id="aiInput" placeholder="Masalan: qarzdorlar, eng faol o‘quvchi, shu oy nechta dars keldi">
+        </div>
+        <button class="btn btn-primary" onclick="askAI()">Yuborish</button>
+        <div class="helper-response" id="aiResponse">Yordamchi tayyor.</div>
+        <p class="muted">Hozir bu ichki aqlli yordamchi. Keyinroq haqiqiy AI bot bilan ulash mumkin.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2 class="section-title">Guruhlar jadvali</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Guruh nomi</th><th>Jadval</th><th>O‘quvchilar</th><th>Shu oy kelish</th><th>Harakat</th></tr>
+            </thead>
+            <tbody id="groupTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h2 class="section-title">O‘quvchilar jadvali</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Ism</th><th>Guruh</th><th>Shu oy dars</th><th>Oylik to‘lov</th><th>Holat</th><th>Tel</th><th>Uy vazifa qilmagan</th><th>Harakat</th></tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Bu versiya frontend tayyor demo hisoblanadi. Telefonlarda <b>SMS</b> va <b>Qo‘ng‘iroq</b> tugmalari ishlaydi.
+    Keyingi bosqichda Firebase yoki backend bilan to‘liq real tizim qilish mumkin.
+  </div>
+</div>
+
+<div class="modal" id="studentModal">
+  <div class="modal-content">
+    <div class="modal-top">
+      <h2 id="modalTitle" style="margin:0; color:var(--primary);">O‘quvchi ma’lumoti</h2>
+      <button class="btn btn-danger" onclick="closeModal()">Yopish</button>
+    </div>
+    <div id="modalInfo"></div>
+    <div class="card" style="margin-top:14px; box-shadow:none; border:1px solid var(--border);">
+      <h3 style="margin-top:0; color:var(--primary);">Davomat qo‘shish</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Sana</label><input type="date" id="attendanceDate"></div>
+        <div class="form-group"><label>Vaqt</label><input type="time" id="attendanceTime"></div>
+      </div>
+      <div class="actions-row">
+        <button class="btn btn-success" onclick="addAttendanceFromModal()">Kelgan deb belgilash</button>
+        <button class="btn btn-light" onclick="addAttendanceNow()">Hozirgi sana-vaqt bilan qo‘shish</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px; box-shadow:none; border:1px solid var(--border);">
+      <h3 style="margin-top:0; color:var(--primary);">Darsga kelgan sanalar va vaqtlar</h3>
+      <div id="attendanceList" class="attendance-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // PWA uchun logo (icon-192.png mavjud bo'lmasa matnli logo ishlatiladi)
+  const LOGO_URL = "icon-192.png";
+
+  const STORAGE_KEY = "euroasia_education_crm_v3";
+  let selectedStudentId = null;
+  let filterGroupId = null;
+  let deferredInstallPrompt = null;
+
+  let state = {
+    groups: [
+      { id: id(), name: "IELTS Morning", schedule: "Du-Chor-Juma 14:00" },
+      { id: id(), name: "General English", schedule: "Sesh-Payshanba-Shanba 10:00" }
+    ],
+    students: [
+      { id: id(), groupId: "", name: "Ali Valiyev", parentPhone: "+998901234567",
+        monthlyFee: 500000, paid: true, note: "", homeworkMissed: 0,
+        attendance: [{ date: todayDate(), time: currentTime() }] },
+      { id: id(), groupId: "", name: "Madina Karimova", parentPhone: "+998919876543",
+        monthlyFee: 500000, paid: false, note: "To'lov eslatmasi yuborilsin",
+        homeworkMissed: 1, attendance: [] }
+    ]
+  };
+
+  function id() { return "_" + Math.random().toString(36).slice(2, 9); }
+  function todayDate() { return new Date().toISOString().split("T")[0]; }
+  function currentTime() {
+    const d = new Date();
+    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try { state = JSON.parse(saved); } catch(e) {}
+    } else {
+      if (state.groups[0]) state.students[0].groupId = state.groups[0].id;
+      if (state.groups[1]) state.students[1].groupId = state.groups[1].id;
+      saveData();
+    }
+  }
+  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function setLogo() {
+    const img = document.getElementById("logoImg");
+    img.src = LOGO_URL;
+    img.onerror = function() {
+      img.style.display = "none";
+      const brand = document.querySelector(".brand > div");
+      brand.style.paddingLeft = "0";
+    };
+  }
+
+  function money(n) { return Number(n || 0).toLocaleString("uz-UZ") + " so‘m"; }
+  function monthKey(d) { return d ? d.slice(0,7) : ""; }
+  function currentMonthKey() { return new Date().toISOString().slice(0,7); }
+  function countAttendanceThisMonth(s) {
+    return (s.attendance || []).filter(a => monthKey(a.date) === currentMonthKey()).length;
+  }
+  function totalAttendancesThisMonth() {
+    return state.students.reduce((sum, s) => sum + countAttendanceThisMonth(s), 0);
+  }
+  function getGroupName(gid) {
+    const g = state.groups.find(x => x.id === gid);
+    return g ? g.name : "—";
+  }
+  function studentCountInGroup(gid) {
+    return state.students.filter(s => s.groupId === gid).length;
+  }
+  function groupAttendanceThisMonth(gid) {
+    return state.students.filter(s => s.groupId === gid)
+      .reduce((sum, s) => sum + countAttendanceThisMonth(s), 0);
+  }
+  function debtorsCount() { return state.students.filter(s => !s.paid).length; }
+
+  function renderStats() {
+    document.getElementById("statGroups").textContent = state.groups.length;
+    document.getElementById("statStudents").textContent = state.students.length;
+    document.getElementById("statAttendances").textContent = totalAttendancesThisMonth();
+    document.getElementById("statDebtors").textContent = debtorsCount();
+  }
+
+  function renderGroupOptions() {
+    const select = document.getElementById("studentGroup");
+    select.innerHTML = "";
+    if (!state.groups.length) {
+      select.innerHTML = `<option value="">Avval guruh qo'shing</option>`;
+      return;
+    }
+    state.groups.forEach(g => {
+      select.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+    });
+  }
+
+  function renderGroups() {
+    const tbody = document.getElementById("groupTableBody");
+    tbody.innerHTML = "";
+    if (!state.groups.length) {
+      tbody.innerHTML = `<tr><td colspan="5">Hozircha guruh yo'q</td></tr>`;
+      return;
+    }
+    state.groups.forEach(g => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${g.name}</td><td>${g.schedule || "—"}</td>
+          <td>${studentCountInGroup(g.id)}</td><td>${groupAttendanceThisMonth(g.id)}</td>
+          <td>
+            <div class="mini-buttons">
+              <button class="btn btn-light" onclick="editGroup('${g.id}')">Tahrirlash</button>
+              <button class="btn btn-secondary" onclick="filterByGroup('${g.id}')">Ko'rish</button>
+              <button class="btn btn-danger" onclick="deleteGroup('${g.id}')">O'chirish</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function renderStudents() {
+    const tbody = document.getElementById("studentTableBody");
+    tbody.innerHTML = "";
+    let list = [...state.students];
+    if (filterGroupId) list = list.filter(s => s.groupId === filterGroupId);
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="8">Hozircha o'quvchi yo'q</td></tr>`;
+      return;
+    }
+    list.forEach(s => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${s.name}</td><td>${getGroupName(s.groupId)}</td>
+          <td>${countAttendanceThisMonth(s)}</td><td>${money(s.monthlyFee)}</td>
+          <td><span class="badge ${s.paid ? "badge-paid" : "badge-unpaid"}">${s.paid ? "To'langan" : "Qarzdor"}</span></td>
+          <td>${s.parentPhone || "—"}</td><td>${s.homeworkMissed || 0}</td>
+          <td>
+            <div class="mini-buttons">
+              <button class="btn btn-success" onclick="quickAttendance('${s.id}')">Keldi</button>
+              <button class="btn btn-light" onclick="openStudentModal('${s.id}')">Kirish</button>
+              <button class="btn btn-light" onclick="editStudent('${s.id}')">Edit</button>
+              <button class="btn btn-sms" onclick="sendSMS('${s.id}','absent')">❌ SMS</button>
+              <button class="btn btn-sms" onclick="sendSMS('${s.id}','payment')">💰 SMS</button>
+              <button class="btn btn-sms" onclick="sendHomeworkSMS('${s.id}')">📚 SMS</button>
+              <button class="btn btn-call" onclick="makeCall('${s.id}')">📞 Call</button>
+              <button class="btn btn-danger" onclick="deleteStudent('${s.id}')">Del</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function saveGroup() {
+    const editId = document.getElementById("groupEditId").value;
+    const name = document.getElementById("groupName").value.trim();
+    const schedule = document.getElementById("groupSchedule").value.trim();
+    if (!name) return alert("Guruh nomini kiriting");
+    if (editId) {
+      const g = state.groups.find(x => x.id === editId);
+      if (g) { g.name = name; g.schedule = schedule; }
+    } else {
+      state.groups.push({ id: id(), name, schedule });
+    }
+    saveData(); clearGroupForm(); renderAll();
+  }
+  function editGroup(groupId) {
+    const g = state.groups.find(x => x.id === groupId);
+    if (!g) return;
+    document.getElementById("groupEditId").value = g.id;
+    document.getElementById("groupName").value = g.name;
+    document.getElementById("groupSchedule").value = g.schedule || "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function clearGroupForm() {
+    document.getElementById("groupEditId").value = "";
+    document.getElementById("groupName").value = "";
+    document.getElementById("groupSchedule").value = "";
+  }
+  function deleteGroup(groupId) {
+    const hasStudents = state.students.some(s => s.groupId === groupId);
+    if (hasStudents) {
+      alert("Bu guruhda o'quvchilar bor. Avval o'chirib tashlang.");
+      return;
+    }
+    if (!confirm("Guruh o'chirilsinmi?")) return;
+    state.groups = state.groups.filter(g => g.id !== groupId);
+    if (filterGroupId === groupId) filterGroupId = null;
+    saveData(); renderAll();
+  }
+
+  function saveStudent() {
+    const editId = document.getElementById("studentEditId").value;
+    const name = document.getElementById("studentName").value.trim();
+    const groupId = document.getElementById("studentGroup").value;
+    const parentPhone = document.getElementById("studentPhone").value.trim();
+    const monthlyFee = Number(document.getElementById("studentFee").value || 0);
+    const paid = document.getElementById("studentPaid").value === "true";
+    const note = document.getElementById("studentNote").value.trim();
+    if (!name) return alert("O'quvchi ismini kiriting");
+    if (!groupId) return alert("Guruh tanlang");
+
+    if (editId) {
+      const s = state.students.find(x => x.id === editId);
+      if (s) {
+        s.name = name; s.groupId = groupId; s.parentPhone = parentPhone;
+        s.monthlyFee = monthlyFee; s.paid = paid; s.note = note;
+      }
+    } else {
+      state.students.push({
+        id: id(), name, groupId, parentPhone, monthlyFee, paid, note,
+        homeworkMissed: 0, attendance: []
+      });
+    }
+    saveData(); clearStudentForm(); renderAll();
+  }
+  function editStudent(studentId) {
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    document.getElementById("studentEditId").value = s.id;
+    document.getElementById("studentName").value = s.name;
+    document.getElementById("studentGroup").value = s.groupId;
+    document.getElementById("studentPhone").value = s.parentPhone || "";
+    document.getElementById("studentFee").value = s.monthlyFee || "";
+    document.getElementById("studentPaid").value = String(s.paid);
+    document.getElementById("studentNote").value = s.note || "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function clearStudentForm() {
+    document.getElementById("studentEditId").value = "";
+    document.getElementById("studentName").value = "";
+    document.getElementById("studentPhone").value = "";
+    document.getElementById("studentFee").value = "";
+    document.getElementById("studentPaid").value = "true";
+    document.getElementById("studentNote").value = "";
+    if (state.groups[0]) document.getElementById("studentGroup").value = state.groups[0].id;
+  }
+  function deleteStudent(studentId) {
+    if (!confirm("O'quvchi o'chirilsinmi?")) return;
+    state.students = state.students.filter(s => s.id !== studentId);
+    saveData(); renderAll();
+  }
+
+  function quickAttendance(studentId) {
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    s.attendance.push({ date: todayDate(), time: currentTime() });
+    saveData(); renderAll();
+  }
+
+  function openStudentModal(studentId) {
+    selectedStudentId = studentId;
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    document.getElementById("modalTitle").textContent = s.name + " — ma'lumotlar";
+    document.getElementById("attendanceDate").value = todayDate();
+    document.getElementById("attendanceTime").value = currentTime();
+    document.getElementById("modalInfo").innerHTML = `
+      <div class="form-grid">
+        <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+          <b>Guruh:</b> ${getGroupName(s.groupId)}<br><br>
+          <b>Ota-ona telefoni:</b> ${s.parentPhone || "—"}<br><br>
+          <b>Shu oy darsga kelgani:</b> ${countAttendanceThisMonth(s)} ta
+        </div>
+        <div class="card" style="box-shadow:none; border:1px solid var(--border);">
+          <b>Oylik to'lov:</b> ${money(s.monthlyFee)}<br><br>
+          <b>To'lov holati:</b> ${s.paid ? "To'langan" : "To'lanmagan"}<br><br>
+          <b>Uy vazifa qilmagan soni:</b> ${s.homeworkMissed || 0}
+        </div>
+      </div>
+      <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-top:12px;">
+        <b>Izoh:</b><br>${s.note || "Izoh yo'q"}
+      </div>`;
+    renderAttendanceList(studentId);
+    document.getElementById("studentModal").classList.add("show");
+  }
+  function closeModal() {
+    selectedStudentId = null;
+    document.getElementById("studentModal").classList.remove("show");
+  }
+  function renderAttendanceList(studentId) {
+    const box = document.getElementById("attendanceList");
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    const sorted = [...(s.attendance || [])].sort((a,b) =>
+      (b.date+" "+b.time).localeCompare(a.date+" "+a.time));
+    if (!sorted.length) { box.innerHTML = `<div class="attendance-item">Hozircha davomat kiritilmagan</div>`; return; }
+    box.innerHTML = sorted.map((a, i) => `
+      <div class="attendance-item"><div><b>${i+1}.</b> ${a.date}</div><div>${a.time}</div></div>`).join("");
+  }
+  function addAttendanceFromModal() {
+    if (!selectedStudentId) return;
+    const s = state.students.find(x => x.id === selectedStudentId);
+    if (!s) return;
+    const date = document.getElementById("attendanceDate").value;
+    const time = document.getElementById("attendanceTime").value;
+    if (!date || !time) return alert("Sana va vaqtni kiriting");
+    s.attendance.push({ date, time });
+    saveData(); renderAll(); openStudentModal(selectedStudentId);
+  }
+  function addAttendanceNow() {
+    if (!selectedStudentId) return;
+    const s = state.students.find(x => x.id === selectedStudentId);
+    if (!s) return;
+    s.attendance.push({ date: todayDate(), time: currentTime() });
+    saveData(); renderAll(); openStudentModal(selectedStudentId);
+  }
+
+  function sendSMS(studentId, type) {
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    if (!s.parentPhone) return alert("Telefon raqami yo'q");
+    let msg = "EUROASIA EDUCATION: ";
+    if (type === "absent") msg += `Hurmatli ota-ona, ${s.name} bugungi darsga kelmadi.`;
+    else if (type === "payment") msg += `Hurmatli ota-ona, ${s.name}ning oylik to'lovi kutilmoqda. Iltimos, to'lovni amalga oshiring.`;
+    window.location.href = `sms:${s.parentPhone}?body=${encodeURIComponent(msg)}`;
+  }
+  function sendHomeworkSMS(studentId) {
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    if (!s.parentPhone) return alert("Telefon raqami yo'q");
+    s.homeworkMissed = Number(s.homeworkMissed || 0) + 1;
+    saveData(); renderAll();
+    const msg = `EUROASIA EDUCATION: Hurmatli ota-ona, ${s.name} bugun uyga vazifani bajarmadi.`;
+    window.location.href = `sms:${s.parentPhone}?body=${encodeURIComponent(msg)}`;
+  }
+  function makeCall(studentId) {
+    const s = state.students.find(x => x.id === studentId);
+    if (!s) return;
+    if (!s.parentPhone) return alert("Telefon raqami yo'q");
+    window.location.href = `tel:${s.parentPhone}`;
+  }
+
+  function filterByGroup(groupId) {
+    if (filterGroupId === groupId) filterGroupId = null;
+    else filterGroupId = groupId;
+    renderStudents();
+    renderGroups();
+  }
+
+  function askAI() {
+    const q = document.getElementById("aiInput").value.toLowerCase().trim();
+    const out = document.getElementById("aiResponse");
+    if (!q) { out.textContent = "Savol kiriting."; return; }
+    const debtors = state.students.filter(s => !s.paid);
+    const mostActive = [...state.students].sort((a,b) => countAttendanceThisMonth(b) - countAttendanceThisMonth(a))[0];
+    const totalFees = state.students.reduce((sum, s) => sum + Number(s.monthlyFee||0), 0);
+    const unpaidFees = debtors.reduce((sum, s) => sum + Number(s.monthlyFee||0), 0);
+    if (q.includes("qarzdor")) {
+      out.innerHTML = debtors.length
+        ? "Qarzdorlar: <b>" + debtors.map(s => s.name).join(", ") + "</b>"
+        : "Qarzdor o'quvchi yo'q.";
+    } else if (q.includes("eng faol") || q.includes("kop dars") || q.includes("ko'p dars")) {
+      out.innerHTML = mostActive
+        ? `Eng faol o'quvchi: <b>${mostActive.name}</b> — shu oy <b>${countAttendanceThisMonth(mostActive)}</b> ta darsga kelgan.`
+        : "Ma'lumot topilmadi.";
+    } else if (q.includes("shu oy") && q.includes("dars")) {
+      out.innerHTML = `Shu oy jami <b>${totalAttendancesThisMonth()}</b> ta dars kelish qayd etilgan.`;
+    } else if (q.includes("jami tolov") || q.includes("jami to'lov")) {
+      out.innerHTML = `Jami oyliklar yig'indisi: <b>${money(totalFees)}</b>. Qarzdor summa: <b>${money(unpaidFees)}</b>.`;
+    } else if (q.includes("guruh")) {
+      out.innerHTML = `Jami <b>${state.groups.length}</b> ta guruh bor: ${state.groups.map(g => g.name).join(", ")}.`;
+    } else if (q.includes("oquvchi") || q.includes("o'quvchi")) {
+      out.innerHTML = `Jami <b>${state.students.length}</b> ta o'quvchi mavjud.`;
+    } else {
+      out.innerHTML = `Masalan shularni yozishingiz mumkin: <b>qarzdorlar</b>, <b>eng faol o'quvchi</b>, <b>shu oy nechta dars</b>, <b>jami to'lov</b>.`;
+    }
+  }
+
+  function exportData() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "euroasia-data.json";
+    a.click();
+  }
+  function importData(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.groups || !data.students) { alert("Noto'g'ri fayl"); return; }
+        state = data; saveData(); renderAll();
+        alert("Ma'lumot import qilindi");
+      } catch { alert("JSON fayl xato"); }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetAll() {
+    if (!confirm("Hamma ma'lumot o'chirilsinmi?")) return;
+    localStorage.removeItem(STORAGE_KEY); location.reload();
+  }
+
+  function renderAll() {
+    renderStats();
+    renderGroupOptions();
+    renderGroups();
+    renderStudents();
+    clearStudentForm();
+  }
+
+  // === PWA: install + service worker ===
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const banner = document.getElementById("installBanner");
+    if (banner && !localStorage.getItem("install_dismissed")) {
+      banner.classList.add("show");
+    }
+  });
+  document.getElementById("installBtn")?.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    document.getElementById("installBanner")?.classList.remove("show");
+  });
+  document.getElementById("installClose")?.addEventListener("click", () => {
+    localStorage.setItem("install_dismissed", "1");
+    document.getElementById("installBanner")?.classList.remove("show");
+  });
+  window.addEventListener("appinstalled", () => {
+    document.getElementById("installBanner")?.classList.remove("show");
+    localStorage.setItem("install_dismissed", "1");
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+
+  loadData();
+  setLogo();
+  renderAll();
+
+  // Splashni yashirish
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const sp = document.getElementById("splash");
+      if (sp) {
+        sp.classList.add("hidden");
+        setTimeout(() => sp.remove(), 500);
+      }
+    }, 600);
+  });
+</script>
+</body>
+</html>

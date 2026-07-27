@@ -1,0 +1,34 @@
+{
+  "name": "uz.euroasia.crm",
+  "displayName": "EuroAsia CRM",
+  "version": "7.0.0",
+  "description": "EuroAsia Education CRM — Sodda HEMIS Maktab va Markaz Boshqaruvi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cordova build android --debug",
+    "build:release": "cordova build android --release"
+  },
+  "keywords": [
+    "crm",
+    "education",
+    "hemis",
+    "attendance",
+    "cordova",
+    "android"
+  ],
+  "author": "EuroAsia Education Team",
+  "license": "MIT",
+  "dependencies": {
+    "cordova-android": "^13.0.0"
+  },
+  "devDependencies": {
+    "cordova": "^12.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {}
+  }
+}
