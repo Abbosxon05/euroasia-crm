@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="uz.euroasia.crm" version="7.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>EuroAsia CRM</name>
-    <description>EuroAsia Education CRM — Sodda HEMIS Maktab va Markaz Boshqaruvi</description>
+    <description>EuroAsia Education CRM — Sodda HEMIS</description>
     <author email="info@euroasia.uz" href="https://euroasia.uz">EuroAsia Education Team</author>
     <content src="index.html" />
     <access origin="*" />
@@ -14,8 +14,6 @@
     <preference name="Orientation" value="portrait" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="22" />
-    <preference name="android-targetSdkVersion" value="32" />
+    <preference name="android-targetSdkVersion" value="33" />
     <preference name="AndroidXEnabled" value="true" />
-    <preference name="GradleVersion" value="7.3.3" />
-    <preference name="AndroidGradlePluginVersion" value="7.2.1" />
 </widget>
